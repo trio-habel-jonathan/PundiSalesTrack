@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PundiSalesTrack - Sales Monitoring System</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+
     <style>
         .hero-gradient {
             background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 30%, #DBEAFE 70%, #EFF6FF 100%);
@@ -13,6 +15,9 @@
             background: linear-gradient(to right, #1E40AF, #3B82F6);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+        }
+        body {
+            font-family: 'Montserrat', sans-serif;
         }
     </style>
 </head>

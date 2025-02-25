@@ -11,7 +11,27 @@
         </div>
         
         <div class="flex items-center space-x-4">
-            <form method="GET" action="{{ route('kunjungan.index') }}">
+            <form method="GET" action="{{ route('kunjungan.index') }}" class="flex items-center space-x-3">
+                <!-- Date Filters -->
+                <div class="flex items-center space-x-2">
+                    <div>
+                        <input type="date" 
+                               name="tanggal_mulai" 
+                               value="{{ request('tanggal_mulai') }}" 
+                               class="px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                               placeholder="Tanggal Mulai">
+                    </div>
+                    <span class="text-gray-500">s/d</span>
+                    <div>
+                        <input type="date" 
+                               name="tanggal_selesai" 
+                               value="{{ request('tanggal_selesai') }}" 
+                               class="px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                               placeholder="Tanggal Selesai">
+                    </div>
+                </div>
+                
+                <!-- Search Field -->
                 <div class="relative">
                     <input type="text" 
                            name="search" 
@@ -125,7 +145,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="4" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
+                        <td colspan="8" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
                            Tidak ada kunjungan yang ditemukan.
                         </td>
                     </tr>
@@ -136,8 +156,8 @@
     </div>
 
     <!-- Pagination -->
-    {{-- <div class="mt-6">
-        {{ $jabatan->links() }}
-    </div> --}}
+    <div class="mt-6">
+        {{ $kunjungan->withQueryString()->links() }}
+    </div>
 </div>
 @endsection

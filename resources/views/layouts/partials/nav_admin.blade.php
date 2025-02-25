@@ -25,15 +25,6 @@
             <span class="ml-3">Jadwal</span>
         </a>
 
-        <!-- Laporan -->
-        <a href="#" class="flex items-center px-4 py-3 {{ request()->routeIs('laporan.*') ? 'text-blue-600 bg-blue-50' : 'text-gray-700 hover:bg-gray-50' }} rounded-xl">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-            </svg>
-            <span class="ml-3">Laporan</span>
-            <span class="ml-auto bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full text-xs">12</span>
-        </a>
-
         <!-- Users -->
         <a href="{{ route('users.index') }}" class="flex items-center px-4 py-3 {{ request()->routeIs('users.*') ? 'text-blue-600 bg-blue-50' : 'text-gray-700 hover:bg-gray-50' }} rounded-xl">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -93,14 +84,6 @@
         </a>
 
 
-        <!-- Overview -->
-        <a href="#" class="flex items-center px-4 py-3 {{ request()->routeIs('overview.*') ? 'text-blue-600 bg-blue-50' : 'text-gray-700 hover:bg-gray-50' }} rounded-xl">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-            <span class="ml-3">Overview</span>
-        </a>
-
         <!-- Projects -->
         <a href="{{ route('kunjungan.index') }}" class="flex items-center px-4 py-3 {{ request()->routeIs('kunjungan.*') ? 'text-blue-600 bg-blue-50' : 'text-gray-700 hover:bg-gray-50' }} rounded-xl">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -111,12 +94,15 @@
 
        
 
-        <form action="{{ route('logout') }}" method="POST" class="flex items-center px-4 py-3 rounded-xl">
-            @csrf
-            <button type="submit" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-xl">
-                <span class="ml-3">Logout</span>
-            </button>
-            
-        </form>
+       <!-- Logout -->
+<form action="{{ route('logout') }}" method="POST" class="mt-2">
+    @csrf
+    <button type="submit" class="w-full flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-xl">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+        </svg>
+        <span class="ml-3">Logout</span>
+    </button>
+</form>
     </nav>
 </div>

@@ -19,6 +19,7 @@ class KunjunganController extends Controller
     public function index(Request $request) {
         $query = Kunjungan::orderBy('id_kunjungan', 'desc');
     
+        // Text search
         if ($request->has('search') && !empty($request->search)) {
             $search = $request->search;
             $query->whereHas('klien', function ($q) use ($search) {
@@ -28,6 +29,15 @@ class KunjunganController extends Controller
             })->orWhereHas('profil_sales', function ($q) use ($search) {
                 $q->where('nama', 'like', "%$search%");
             })->orWhere('status', 'like', "%$search%");
+        }
+        
+        // Date filtering
+        if ($request->has('tanggal_mulai') && !empty($request->tanggal_mulai)) {
+            $query->whereDate('waktu_mulai', '>=', $request->tanggal_mulai);
+        }
+        
+        if ($request->has('tanggal_selesai') && !empty($request->tanggal_selesai)) {
+            $query->whereDate('waktu_mulai', '<=', $request->tanggal_selesai);
         }
     
         $kunjungan = $query->paginate(10);
