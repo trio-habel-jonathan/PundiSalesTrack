@@ -12,13 +12,30 @@ use Illuminate\Support\Facades\Auth;
 
 class JadwalController extends Controller
 {
-    public function index() {
+    public function index(Request $request) {
+        $query = Jadwal::query();
         
-        $jadwal = Jadwal::paginate(10);
-
-        return view('admin.jadwal.index',compact('jadwal'));
+        // Text search for tim_sales name
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->search;
+            $query->whereHas('tim_sales', function ($q) use ($search) {
+                $q->where('nama_tim_sales', 'like', "%$search%");
+            });
+        }
+        
+        // Date filtering for tanggal_kunjungan
+        if ($request->has('tanggal_kunjungan') && !empty($request->tanggal_kunjungan)) {
+            $query->whereDate('tanggal_kunjungan', $request->tanggal_kunjungan);
+        }
+        
+        // Sort by latest first
+        $query->orderBy('tanggal_kunjungan', 'desc');
+        
+        $jadwal = $query->paginate(10)->withQueryString();
+        
+        return view('admin.jadwal.index', compact('jadwal'));
     }
-
+    
     public function create() {
 
         $tim_sales = TimSales::all();

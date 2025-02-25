@@ -11,7 +11,16 @@
         </div>
         
         <div class="flex items-center space-x-4">
-            <form method="GET" action="{{ route('jabatan.index') }}">
+            <form method="GET" action="{{ route('jadwal.index') }}"  class="flex items-center space-x-3">
+                <div class="flex items-center space-x-2">
+                    <div>
+                        <input type="date" 
+                               name="tanggal_kunjungan" 
+                               value="{{ request('tanggal_kunjungan') }}" 
+                               class="px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                    </div>
+                
+                </div>
                 <div class="relative">
                     <input type="text" 
                            name="search" 
@@ -121,7 +130,7 @@
 
     <!-- Pagination -->
     <div class="mt-6">
-        {{ $jadwal->links() }}
+        {{ $jadwal->withQueryString()->links() }}
     </div>
 </div>
 @endsection

@@ -181,16 +181,47 @@ public function update(Request $request, $id)
 
     // ------------------------------------ SALES ----------------------------------
 
-    public function index_sales() {
+    public function index_sales(Request $request) {
         $userId = Auth::id();
         $profil_sales = ProfilSales::where('id_users', $userId)->first();
+        
         if (!$profil_sales) {
             return redirect()->route('sales.profil_sales.index')
                              ->with('error', 'Anda belum memiliki profil sales.');
         }
+        
         $tim_sales_id = $profil_sales->id_tim_sales;
         $profil_sales_tim = ProfilSales::where('id_tim_sales', $tim_sales_id)->pluck('id_profile_sales');
-        $kunjungan = Kunjungan::whereIn('id_profile_sales', $profil_sales_tim)->paginate(10);
+        
+        $query = Kunjungan::whereIn('id_profile_sales', $profil_sales_tim);
+        
+        // Text search
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->whereHas('klien', function ($subq) use ($search) {
+                    $subq->where('nama_klien', 'like', "%$search%");
+                })->orWhereHas('produk', function ($subq) use ($search) {
+                    $subq->where('nama_produk', 'like', "%$search%");
+                })->orWhereHas('profil_sales', function ($subq) use ($search) {
+                    $subq->where('nama', 'like', "%$search%");
+                })->orWhere('status', 'like', "%$search%");
+            });
+        }
+        
+        // Date filtering
+        if ($request->has('tanggal_mulai') && !empty($request->tanggal_mulai)) {
+            $query->whereDate('waktu_mulai', '>=', $request->tanggal_mulai);
+        }
+        
+        if ($request->has('tanggal_selesai') && !empty($request->tanggal_selesai)) {
+            $query->whereDate('waktu_mulai', '<=', $request->tanggal_selesai);
+        }
+        
+        $query->orderBy('waktu_mulai', 'desc');
+        
+        $kunjungan = $query->paginate(10)->withQueryString();
+        
         return view('sales.kunjungan.index', compact('profil_sales', 'kunjungan'));
     }
     
