@@ -105,21 +105,28 @@
                     @enderror
                 </div>
 
-                <!-- Harga -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        Harga
-                    </label>
-                    <input type="number" 
-                           name="harga" 
-                           value="{{ old('harga', $produk->harga) }}" 
-                           class="w-full px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 @error('harga') border-red-500 @enderror"
-                           placeholder="Masukkan harga"
-                           required>
-                    @error('harga')
-                        <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
-                    @enderror
-                </div>
+               <!-- Harga -->
+<div>
+    <label class="block text-sm font-medium text-gray-700 mb-2">
+        Harga
+    </label>
+    <div class="relative">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <span class="text-gray-500 sm:text-sm">Rp</span>
+        </div>
+        <input type="text" 
+               id="display_harga"
+               class="w-full pl-12 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 @error('harga') border-red-500 @enderror"
+               placeholder="0"
+               value="{{ number_format(old('harga', $produk->harga), 0, ',', '.') }}"
+               onkeyup="formatCurrency(this)"
+               required>
+        <input type="hidden" name="harga" id="harga_value" value="{{ old('harga', $produk->harga) }}">
+    </div>
+    @error('harga')
+        <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+    @enderror
+</div>
 
                 <!-- Deskripsi Produk -->
                 <div class="md:col-span-2">
@@ -170,5 +177,49 @@
         };
         reader.readAsDataURL(input.files[0]);
     }
+    function previewImage(event, index) {
+        var input = event.target;
+        var reader = new FileReader();
+        reader.onload = function () {
+            var imgElement = document.getElementById('preview-image-' + index);
+            var uploadText = document.getElementById('upload-text-' + index);
+            imgElement.src = reader.result;
+            imgElement.classList.remove('hidden');
+            uploadText.classList.add('hidden');
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+    
+    function formatCurrency(input) {
+        // Hapus semua karakter non-digit
+        let value = input.value.replace(/\D/g, '');
+        
+        // Konversi ke number
+        let number = parseInt(value, 10);
+        
+        // Jika bukan angka, set menjadi 0
+        if (isNaN(number)) {
+            number = 0;
+        }
+        
+        // Set nilai asli (yang akan dikirim ke server) ke input hidden
+        document.getElementById('harga_value').value = number;
+        
+        // Format angka dengan pemisah ribuan
+        input.value = new Intl.NumberFormat('id-ID').format(number);
+    }
+    
+    // Tangani form submission
+    document.querySelector('form').addEventListener('submit', function(e) {
+        // Pastikan nilai harga sudah benar sebelum submit
+        let displayHarga = document.getElementById('display_harga');
+        let hargaValue = document.getElementById('harga_value');
+        
+        if (!hargaValue.value) {
+            // Jika hidden field belum terisi, ambil dari display dan format
+            let rawValue = displayHarga.value.replace(/\D/g, '');
+            hargaValue.value = rawValue;
+        }
+    });
 </script>
 @endsection
