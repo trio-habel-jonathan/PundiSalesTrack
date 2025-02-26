@@ -81,6 +81,7 @@ Route::middleware(['auth', 'role:sales'])->group(function(){
     Route::get('/create', [KunjunganController::class, 'create_sales'])->name('sales.kunjungan.create');
     Route::post('/store', [KunjunganController::class, 'store_sales'])->name('sales.kunjungan.store');
     
+    
     Route::get('/sales/tim_sales', [TimSalesController::class, 'index_sales'])->name('sales.tim_sales.index');
     
 

@@ -224,11 +224,30 @@ public function update(Request $request, $id)
         
         return view('sales.kunjungan.index', compact('profil_sales', 'kunjungan'));
     }
+
+    public function detail_sales($id) {
+        $userId = Auth::id();
+        $profil_sales = ProfilSales::where('id_users', $userId)->first();
+        
+        if (!$profil_sales) {
+            return redirect()->route('sales.profil_sales.index')
+                             ->with('error', 'Anda belum memiliki profil sales.');
+        }
     
-    /**
-     * Halaman validasi lokasi untuk sales.
-     * URL misal: /sales/kunjungan/validate_sales?jadwal=2
-     */
+        // Ambil data kunjungan beserta relasi
+        $kunjungan = Kunjungan::with(['produk', 'klien', 'profil_sales', 'jadwal'])->findOrFail($id);
+    
+        // Cek apakah pengguna dalam tim yang sama dengan pemilik kunjungan
+        if ($kunjungan->profil_sales->id_tim_sales !== $profil_sales->id_tim_sales) {
+            return redirect()->route('sales.kunjungan.index')
+                             ->with('error', 'Anda tidak memiliki izin untuk melihat detail kunjungan ini.');
+        }
+    
+        return view('sales.kunjungan.detail', compact('kunjungan'));
+    }
+    
+    
+    
     public function showValidationPage_sales(Request $request) {
         $jadwalId = $request->query('jadwal');
         return view('sales.kunjungan.validate', compact('jadwalId'));

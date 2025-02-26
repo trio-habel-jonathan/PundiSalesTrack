@@ -5,8 +5,8 @@
     <!-- Header with Search and Actions -->
     <div class="flex items-center justify-between mb-8">
         <div>
-            <h1 class="text-2xl font-semibold">Sales Management</h1>
-            <p class="text-sm text-gray-500 mt-1">Manage and monitor sales accounts</p>
+            <h1 class="text-2xl font-semibold">Akun </h1>
+            <p class="text-sm text-gray-500 mt-1">Kelola semua data akun</p>
         </div>
         
         <div class="flex items-center space-x-4">
