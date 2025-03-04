@@ -11,7 +11,7 @@
         </div>
         
         <div class="flex items-center space-x-4">
-            <form method="GET" action="{{ route('kunjungan.index') }}" class="flex items-center space-x-3">
+            <form method="GET" action="{{ route('sales.kunjungan.index') }}" class="flex items-center space-x-3">
                 <!-- Date Filters -->
                 <div class="flex items-center space-x-2">
                     <div>
@@ -48,14 +48,6 @@
                 </div>
             </form>
 
-            <!-- Create User Button -->
-            <a href="{{ route('kunjungan.create') }}" 
-               class="px-4 py-2 bg-black text-white rounded-lg flex items-center space-x-2 hover:bg-gray-900 transition-colors duration-200">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                </svg>
-                <span>Tambah Kunjungan</span>
-            </a>
         </div>
     </div>
    

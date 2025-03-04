@@ -106,17 +106,26 @@ class JadwalController extends Controller
             return redirect()->route('sales.profil_sales.index')->with('error', 'Anda belum memiliki profil sales.');
         }
     
-        // Ambil tanggal hari ini
-        $today = Carbon::today();
+        // Set default date range to today if no filter is applied
+        $tanggal_mulai = request('tanggal_mulai') ? Carbon::parse(request('tanggal_mulai')) : Carbon::today();
+        $tanggal_selesai = request('tanggal_selesai') ? Carbon::parse(request('tanggal_selesai')) : Carbon::today();
+        
+        // Ensure the end date is not before the start date
+        if ($tanggal_selesai->lt($tanggal_mulai)) {
+            $tanggal_selesai = $tanggal_mulai;
+        }
     
-        // Ambil hanya jadwal untuk hari ini
+        // Query jadwal based on date range
         $jadwal = Jadwal::where('id_tim_sales', $profil_sales->id_tim_sales)
-            ->whereDate('tanggal_kunjungan', $today) // Filter hanya untuk hari ini
+            ->whereDate('tanggal_kunjungan', '>=', $tanggal_mulai->format('Y-m-d'))
+            ->whereDate('tanggal_kunjungan', '<=', $tanggal_selesai->format('Y-m-d'))
             ->whereNotIn('status', ['selesai', 'gagal'])
             ->paginate(10);
     
+        // Preserve query string on pagination
+        $jadwal->appends(request()->all());
+    
         return view('sales.jadwal.index', compact('jadwal'));
     }
-    
 
 }
