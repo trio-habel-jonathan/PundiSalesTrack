@@ -248,10 +248,7 @@ public function update(Request $request, $id)
     
     
     
-    public function showValidationPage_sales(Request $request) {
-        $jadwalId = $request->query('jadwal');
-        return view('sales.kunjungan.validate', compact('jadwalId'));
-    }
+
 
     /**
      * Memproses validasi lokasi via AJAX untuk sales.
@@ -293,9 +290,9 @@ public function update(Request $request, $id)
         $jadwalId = $request->input('jadwal');
         $jadwal = Jadwal::findOrFail($jadwalId);
     
-        // Cek apakah validasi lokasi sudah dilakukan dan ID jadwal tervalidasi sama dengan jadwal yang diminta
+        // Jika validasi lokasi belum dilakukan, redirect langsung ke halaman jadwal
         if (!session()->has('location_validated_sales') || session()->get('location_validated_sales') != $jadwalId) {
-            return redirect()->route('sales.kunjungan.validate_sales', ['jadwal' => $jadwalId])
+            return redirect()->route('sales.jadwal.index')
                    ->with('error', 'Silakan validasi lokasi terlebih dahulu.');
         }
     
@@ -310,6 +307,7 @@ public function update(Request $request, $id)
     
         return view('sales.kunjungan.create', compact('klien', 'produk', 'profil_sales', 'jadwal'));
     }
+    
     
 
     public function store_sales(Request $request) { 
