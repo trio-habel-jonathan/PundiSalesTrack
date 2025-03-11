@@ -8,28 +8,28 @@
         <p class="text-gray-500 mt-2">Informasi lengkap profil sales</p>
     </div>
 
-    <!-- Main Card -->
-    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-        <!-- Profile Photo Section -->
-        <div class="bg-gradient-to-r from-gray-100 to-gray-50 p-8 border-b text-center">
-            @if($profil->foto_profil)
-                <div class="relative inline-block">
-                    <img src="{{ asset('storage/' . $profil->foto_profil) }}" 
-                         alt="Foto profil {{ $profil->nama }}" 
-                         class="w-40 h-40 object-cover rounded-full ring-4 ring-white shadow-lg">
-                </div>
-            @else
-                <div class="w-40 h-40 mx-auto flex items-center justify-center bg-white border-4 border-dashed border-gray-300 rounded-full">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-20 w-20 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                </div>
-            @endif
-            <h2 class="text-xl font-semibold text-gray-800 mt-4">{{ $profil->nama }}</h2>
-            <p class="text-gray-500">{{ $profil->jabatan->nama_jabatan ?? 'Tidak Tersedia' }}</p>
-        </div>
+    @if ($profil)
+        <!-- Main Card -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <!-- Profile Photo Section -->
+            <div class="bg-gradient-to-r from-gray-100 to-gray-50 p-8 border-b text-center">
+                @if($profil->foto_profil)
+                    <div class="relative inline-block">
+                        <img src="{{ asset('storage/' . $profil->foto_profil) }}" 
+                             alt="Foto profil {{ $profil->nama }}" 
+                             class="w-40 h-40 object-cover rounded-full ring-4 ring-white shadow-lg">
+                    </div>
+                @else
+                    <div class="w-40 h-40 mx-auto flex items-center justify-center bg-white border-4 border-dashed border-gray-300 rounded-full">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-20 w-20 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                    </div>
+                @endif
+                <h2 class="text-xl font-semibold text-gray-800 mt-4">{{ $profil->nama }}</h2>
+                <p class="text-gray-500">{{ $profil->jabatan->nama_jabatan ?? 'Tidak Tersedia' }}</p>
+            </div>
 
-        <!-- Profile Information -->
         <div class="p-6 space-y-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Tim Sales -->
@@ -88,24 +88,25 @@
                 </div>
             </div>
 
-            <!-- Actions -->
-            <div class="flex items-center justify-end space-x-4 pt-6 border-t border-gray-100">
-                <a href="{{ route('profil_sales.index', $profil->id_profile_sales) }}" 
-                   class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200 flex items-center space-x-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                    </svg>
-                    <span>Kembali</span>
-                </a>
-                <a href="{{ route('profil_sales.edit', $profil->id_profile_sales) }}" 
-                   class="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-900 transition-colors duration-200 flex items-center space-x-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                    </svg>
-                    <span>Edit Profil</span>
-                </a>
             </div>
         </div>
-    </div>
+    @else
+        <!-- Empty State -->
+        <div class="bg-white rounded-xl shadow-md p-8 text-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p class="text-gray-500 text-lg mb-4">Anda belum memiliki profil.</p> 
+
+            <!-- Tombol Buat Profil -->
+            <a href="{{ route('sales.profil_sales.create') }}" 
+               class="inline-flex items-center px-6 py-2 bg-black text-white font-medium rounded-lg shadow-md hover:bg-gray-700 transition duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                Buat Profil
+            </a>
+        </div>
+    @endif
 </div>
 @endsection

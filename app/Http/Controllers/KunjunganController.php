@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Http\Requests\KunjunganRequest;
 use App\Models\Kunjungan;
 use App\Models\Klien;
 use App\Models\Produk;
@@ -12,6 +13,8 @@ use App\Models\FotoKunjungan;
 use App\Models\TimSales;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB; 
+
 
 class KunjunganController extends Controller
 {
@@ -49,42 +52,26 @@ class KunjunganController extends Controller
     public function create() {
         $klien = Klien::all();
         $produk = Produk::all();
-        $profil_sales = ProfilSales::all();
+        $profil_sales = ProfilSales::whereHas('tim_sales')->get();
         $jadwal = Jadwal::all();
         return view('admin.kunjungan.create', compact('klien', 'produk', 'profil_sales', 'jadwal'));
     }
 
-    public function store(Request $request)
-    {
-        $validatedData = $request->validate([
-            'id_klien' => 'required|exists:klien,id_klien',
-            'id_produk' => 'required|exists:produk,id_produk',
-            'id_profile_sales' => 'required|exists:profil_sales,id_profile_sales',
-            'id_jadwal' => 'required|exists:jadwal,id_jadwal',
-            'waktu_mulai' => 'required|date',
-            'waktu_selesai' => 'required|date',
-            'deskripsi_aktivitas' => 'required|string',
-            'status' => 'required|string',
-            'foto_kunjungan.*' => 'required|image|mimes:jpeg,png,jpg|max:2048',
-        ]);
-    
+   public function store(KunjunganRequest $request)
+{
+    DB::beginTransaction(); // Mulai transaksi
+
+    try {
         // Simpan data kunjungan
-        $kunjungan = Kunjungan::create([
-            'id_klien' => $request->id_klien,
-            'id_produk' => $request->id_produk,
-            'id_profile_sales' => $request->id_profile_sales,
-            'id_jadwal' => $request->id_jadwal,
-            'waktu_mulai' => $request->waktu_mulai,
-            'waktu_selesai' => $request->waktu_selesai,
-            'deskripsi_aktivitas' => $request->deskripsi_aktivitas,
-            'status' => $request->status,
-        ]);
-    
+        $kunjungan = Kunjungan::create($request->validated());
+
+        // Jika gagal menyimpan, rollback dan tampilkan error
         if (!$kunjungan) {
+            DB::rollBack();
             return back()->with('error', 'Kunjungan gagal disimpan!');
         }
-    
-        // Upload foto
+
+        // Upload foto jika ada
         if ($request->hasFile('foto_kunjungan')) {
             foreach ($request->file('foto_kunjungan') as $foto) {
                 $path = $foto->store('foto_kunjungan', 'public');
@@ -94,16 +81,21 @@ class KunjunganController extends Controller
                 ]);
             }
         }
-    
+
+        DB::commit(); // Simpan transaksi
         return redirect()->route('kunjungan.index')->with('success', 'Kunjungan Berhasil Ditambahkan!');
+    } catch (\Exception $e) {
+        DB::rollBack(); // Batalkan transaksi jika ada error
+        return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
     }
+}
 
     public function edit($id)
 {
     $kunjungan = Kunjungan::findOrFail($id);
     $klien = Klien::all();
     $produk = Produk::all();
-    $profil_sales = ProfilSales::all();
+    $profil_sales = ProfilSales::whereHas('tim_sales')->get();
     $jadwal = Jadwal::all();
     $foto_kunjungan = FotoKunjungan::where('id_kunjungan', $id)->get();
     
@@ -176,6 +168,20 @@ public function update(Request $request, $id)
         $kunjungan = Kunjungan::with(['produk', 'klien', 'profil_sales', 'jadwal'])->findOrFail($id);
         
         return view('admin.kunjungan.detail', compact('kunjungan'));
+    }
+
+    public function destroy($id) {
+        $kunjungan = Kunjungan::findOrFail($id);
+        $fotoKunjungan = FotoKunjungan::where('id_kunjungan', $id)->get();
+        
+        foreach ($fotoKunjungan as $foto) {
+            Storage::disk('public')->delete($foto->foto);
+            $foto->delete();
+        }
+        
+        $kunjungan->delete();
+        
+        return redirect()->route('kunjungan.index')->with('success', 'Kunjungan Berhasil Dihapus!');
     }
     
 

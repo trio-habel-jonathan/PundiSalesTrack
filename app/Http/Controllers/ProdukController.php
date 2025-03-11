@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\ProdukRequest;
 use App\Models\Produk;
 use App\Models\FotoProduk;
 use App\Models\ProfilSales;
@@ -24,102 +24,60 @@ class ProdukController extends Controller
         return view('admin.produk.create');
     }
 
-    public function store(Request $request) {
-        $validatedData = $request->validate([
-            'nama_produk' => 'required|string|max:100',
-            'deskripsi_produk' => 'required|string|max:255',
-            'harga' => 'required|numeric', 
-            'foto_produk.*' => 'image|mimes:jpeg,png,jpg|max:2048' // Validasi foto
-        ]);
+    public function store(ProdukRequest $request) {
+        $produk = Produk::create($request->only(['nama_produk', 'deskripsi_produk', 'harga']));
     
-        // Simpan produk dulu
-        $produk = Produk::create([
-            'nama_produk' => $request->nama_produk,
-            'deskripsi_produk' => $request->deskripsi_produk,
-            'harga' => $request->harga,
-        ]);
-    
-        // **Cek apakah produk berhasil disimpan**
         if (!$produk) {
             return back()->with('error', 'Produk gagal disimpan!');
         }
     
-        // **Gunakan ID Produk yang baru dibuat untuk foto**
         if ($request->hasFile('foto_produk')) {
             foreach ($request->file('foto_produk') as $foto) {
-                $path = $foto->store('foto_produk', 'public'); // Simpan ke storage
-    
+                $path = $foto->store('foto_produk', 'public');
                 FotoProduk::create([
-                    'id_produk' => $produk->id_produk, 
+                    'id_produk' => $produk->id_produk,
                     'foto' => $path
                 ]);
             }
         }
-        
     
         return redirect()->route('produk.index')->with('success', 'Produk Berhasil Ditambahkan!');
     }
+    
 
     public function edit($id) {
         $produk = Produk::findOrFail($id);
         return view('admin.produk.edit',compact('produk'));
     }
 
-    public function update(Request $request, $id)
-    {  
-    // Validasi request
-    $validatedData = $request->validate([
-        'nama_produk' => 'required|string|max:100',
-        'deskripsi_produk' => 'required|string|max:255',
-        'harga' => 'required|numeric',
-        'foto_produk.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
-    ]);
-
-    // Cari produk
-    $produk = Produk::findOrFail($id);
-
-    // Update informasi produk
-    $produk->update([
-        'nama_produk' => $request->nama_produk,
-        'deskripsi_produk' => $request->deskripsi_produk,
-        'harga' => $request->harga,
-    ]);
-
-    // Handle foto
-    if ($request->hasFile('foto_produk')) {
-        foreach ($request->file('foto_produk') as $index => $foto) {
-            if ($foto) {
-                // Cek apakah ada foto lama di index yang sama
-                $existingFoto = $produk->fotoProduk[$index] ?? null;
-                
-                // Jika ada foto lama, hapus dari storage dan update recordnya
-                if ($existingFoto) {
-                    Storage::disk('public')->delete($existingFoto->foto);
+    
+    public function update(ProdukRequest $request, $id) {  
+        $produk = Produk::findOrFail($id);
+        $produk->update($request->only(['nama_produk', 'deskripsi_produk', 'harga']));
+    
+        if ($request->hasFile('foto_produk')) {
+            foreach ($request->file('foto_produk') as $index => $foto) {
+                if ($foto) {
+                    $existingFoto = $produk->fotoProduk[$index] ?? null;
                     
-                    // Upload foto baru
-                    $path = $foto->store('foto_produk', 'public');
-                    
-                    // Update record yang ada
-                    $existingFoto->update([
-                        'foto' => $path
-                    ]);
-                } else {
-                    // Jika tidak ada foto lama di index ini, buat record baru
-                    $path = $foto->store('foto_produk', 'public');
-                    
-                    FotoProduk::create([
-                        'id_produk' => $produk->id_produk,
-                        'foto' => $path
-                    ]);
+                    if ($existingFoto) {
+                        Storage::disk('public')->delete($existingFoto->foto);
+                        $path = $foto->store('foto_produk', 'public');
+                        $existingFoto->update(['foto' => $path]);
+                    } else {
+                        $path = $foto->store('foto_produk', 'public');
+                        FotoProduk::create([
+                            'id_produk' => $produk->id_produk,
+                            'foto' => $path
+                        ]);
+                    }
                 }
             }
         }
+    
+        return redirect()->route('produk.index')->with('success', 'Produk berhasil diperbarui!');
     }
-
-    return redirect()
-        ->route('produk.index')
-        ->with('success', 'Produk berhasil diperbarui!');
-}
+    
     
 
     public function destroy($id)

@@ -83,7 +83,7 @@
         @empty
         <div class="col-span-full text-center py-12 bg-white rounded-xl">
             <h3 class="mt-2 text-sm font-medium text-gray-900">Tidak ada profil yang ditemukan</h3>
-            <p class="mt-1 text-sm text-gray-500">Get started by creating a new profile.</p>
+            <p class="mt-1 text-sm text-gray-500">Mulai dengan buat profilmu.</p>
         </div>
         @endforelse
     </div>

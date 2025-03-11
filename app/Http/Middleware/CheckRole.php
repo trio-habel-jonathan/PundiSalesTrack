@@ -4,7 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use App\Models\User; // Mengimpor model Pengguna
+use App\Models\User; 
 
 class CheckRole
 {
@@ -15,7 +15,7 @@ class CheckRole
 
         // Jika user tidak ada, atau bukan instance Pengguna, atau role tidak sesuai
         if (!$user || !$user instanceof User || $user->role !== $role) {
-            return redirect();
+            return redirect()->back()->with('error', 'Anda tidak memiliki akses ke halaman ini.');
         }
 
         return $next($request);
