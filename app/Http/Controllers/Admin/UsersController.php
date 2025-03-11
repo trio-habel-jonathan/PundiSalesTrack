@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
 
 use App\Models\User;
 use App\Models\ProfilSales;
@@ -58,7 +60,7 @@ class UsersController extends Controller
             'role' => $validatedData['role'],
         ]);
 
-        return redirect()->route('users.index')->with('success', 'Pengguna berhasil ditambahkan.');
+        return redirect()->route('admin.users.index')->with('success', 'Pengguna berhasil ditambahkan.');
     }
 
     /**
@@ -90,7 +92,7 @@ class UsersController extends Controller
             'password' => $validatedData['password'] ? Hash::make($validatedData['password']) : $user->password,
         ]);
 
-        return redirect()->route('users.index')->with('success', 'Pengguna berhasil diperbarui.');
+        return redirect()->route('admin.users.index')->with('success', 'Pengguna berhasil diperbarui.');
     }
 
     /**
@@ -101,6 +103,6 @@ class UsersController extends Controller
         $user = User::findOrFail($id);
         $user->delete();
 
-        return redirect()->route('users.index')->with('error', 'Pengguna berhasil dihapus.');
+        return redirect()->route('admin.users.index')->with('error', 'Pengguna berhasil dihapus.');
     }
 }

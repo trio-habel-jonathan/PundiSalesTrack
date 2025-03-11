@@ -1,10 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
-
+namespace App\Http\Controllers\Sales;
 
 use App\Http\Controllers\Controller;
-
 
 use App\Http\Requests\ProdukRequest;
 use App\Models\Produk;
@@ -18,14 +16,29 @@ use Illuminate\Support\Facades\Storage;
 class ProdukController extends Controller
 {
     public function index() {
-
         $produk = Produk::paginate(10);
 
-        return view('admin.produk.index',(compact('produk')));
+
+        $userId = Auth::id();
+        $profil_sales = ProfilSales::where('id_users', $userId)->first();
+        if (!$profil_sales) {
+            return redirect()->route('sales.profil_sales.index')
+                             ->with('error', 'Anda belum memiliki profil sales.');
+        }
+
+
+        return view('sales.produk.index', compact('produk'));
+
     }
 
+    public function detail($id) {
+        $produk = Produk::findOrFail($id);
+        return view('sales.produk.detail', compact('produk'));
+    }
+
+
     public function create() {
-        return view('admin.produk.create');
+        return view('sales.produk.create');
     }
 
     public function store(ProdukRequest $request) {
@@ -45,17 +58,15 @@ class ProdukController extends Controller
             }
         }
     
-        return redirect()->route('produk.index')->with('success', 'Produk Berhasil Ditambahkan!');
+        return redirect()->route('sales.produk.index')->with('success', 'Produk Berhasil Ditambahkan!');
     }
-    
 
     public function edit($id) {
         $produk = Produk::findOrFail($id);
-        return view('admin.produk.edit',compact('produk'));
+        return view('sales.produk.edit',compact('produk'));
     }
 
-    
-    public function update(ProdukRequest $request, $id) {  
+ public function update(ProdukRequest $request, $id) {  
         $produk = Produk::findOrFail($id);
         $produk->update($request->only(['nama_produk', 'deskripsi_produk', 'harga']));
     
@@ -79,33 +90,8 @@ class ProdukController extends Controller
             }
         }
     
-        return redirect()->route('produk.index')->with('success', 'Produk berhasil diperbarui!');
+        return redirect()->route('sales.produk.index')->with('success', 'Produk berhasil diperbarui!');
     }
     
     
-
-    public function destroy($id)
-    {
-        $produk = Produk::findOrFail($id);
-    
-        if ($produk->foto_produk) {
-            Storage::disk('public')->delete($produk->foto_produk);
-        }
-
-        $produk->delete();
-    
-        return redirect()->route('produk.index')->with('success', 'Produk Berhasil Dihapus!');
-    }
-
-
-    public function show() {
-        $produk = Produk::all();
-        return view('admin.produk.index', compact('produk'));
-    }
-
-    public function detail($id) {
-        $produk = Produk::findOrFail($id);
-        return view('admin.produk.detail', compact('produk'));
-    }    
-
 }

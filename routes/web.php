@@ -1,25 +1,31 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Response;
+
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Admin\AdminController;
-use App\Http\Controllers\UsersController;
-use App\Http\Controllers\TimSalesController;
+use App\Http\Controllers\Admin\UsersController;
+use App\Http\Controllers\Admin\TimSalesController as AdminTimSalesController;
+use App\Http\Controllers\Sales\TimSalesController as SalesTimSalesController;
 use App\Http\Controllers\Admin\JabatanController;
 use App\Http\Controllers\Admin\ProfilSalesController as AdminProfilSalesController;
 use App\Http\Controllers\Sales\ProfilSalesController as SalesProfilSalesController;
 
 
 
-use App\Http\Controllers\ProdukController;
+use App\Http\Controllers\Admin\ProdukController as AdminProdukController;
+use App\Http\Controllers\Sales\ProdukController as SalesProdukController;
 use App\Http\Controllers\Admin\LokasiController;
 use App\Http\Controllers\Admin\KlienController;
-use App\Http\Controllers\JadwalController;
-use App\Http\Controllers\KunjunganController;
+use App\Http\Controllers\Admin\JadwalController as AdminJadwalController;
+use App\Http\Controllers\Sales\JadwalController as SalesJadwalController;
+use App\Http\Controllers\Admin\KunjunganController as AdminKunjunganController;
+use App\Http\Controllers\Sales\KunjunganController as SalesKunjunganController;
 
 
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Response;
+
 
 
 Route::middleware('guest')->group(function(){
@@ -40,55 +46,70 @@ Route::middleware('auth')->group(function() {
 });
 
 
+
+
 Route::middleware(['auth', 'role:admin'])->group(function(){
     Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
     Route::resource('admin/users', UsersController::class);
-    Route::resource('admin/tim_sales', TimSalesController::class);
+    Route::resource('admin/tim_sales', AdminTimSalesController::class);
     Route::resource('admin/jabatan', JabatanController::class);
     
     Route::resource('admin/profil_sales', AdminProfilSalesController::class);
     Route::get('admin/profil_sales/detail/{id}', [AdminProfilSalesController::class, 'detail'])
         ->name('profil_sales.detail');
     
-    Route::resource('admin/produk', ProdukController::class);
-    Route::get('admin/produk/detail/{id}', [ProdukController::class, 'detail'])
+    Route::resource('admin/produk', AdminProdukController::class);
+    Route::get('admin/produk/detail/{id}', [AdminProdukController::class, 'detail'])
         ->name('produk.detail');
 
     Route::resource('admin/lokasi', LokasiController::class);
     Route::resource('admin/klien', KlienController::class);
-    Route::resource('admin/jadwal', JadwalController::class);
+    Route::resource('admin/jadwal', AdminJadwalController::class);
 
-    Route::resource('admin/kunjungan', KunjunganController::class);
-    Route::get('admin/kunjungan/detail/{id}', [KunjunganController::class, 'detail'])
+    Route::resource('admin/kunjungan', AdminKunjunganController::class);
+    Route::get('admin/kunjungan/detail/{id}', [AdminKunjunganController::class, 'detail'])
         ->name('kunjungan.detail');
 });
 
 
 
-Route::middleware(['auth', 'role:sales'])->prefix('sales')->group(function() {
-    // Halaman profil sales
-    Route::get('/profil_sales', [SalesProfilSalesController::class, 'index'])->name('sales.profil_sales.index');
-    Route::get('/profil_sales/create', [SalesProfilSalesController::class, 'create'])->name('sales.profil_sales.create');
-    Route::post('/profil_sales/store', [SalesProfilSalesController::class, 'store'])->name('sales.profil_sales.store');
+Route::middleware(['auth', 'role:sales'])->prefix('sales')->name('sales.')->group(function() {
 
-    // Produk sales
-    Route::get('/produk', [ProdukController::class, 'index_sales'])->name('sales.produk.index');
-    Route::get('/produk/create', [ProdukController::class, 'create_sales'])->name('sales.produk.create');
-    Route::post('/produk/store', [ProdukController::class, 'store_sales'])->name('sales.produk.store');
-    Route::get('/produk/edit/{id}', [ProdukController::class, 'edit_sales'])->name('sales.produk.edit');
-    Route::put('/produk/update/{id}', [ProdukController::class, 'update_sales'])->name('sales.produk.update');
-    Route::get('/produk/detail/{id}', [ProdukController::class, 'detail_sales'])->name('sales.produk.detail');
+    // Profil Sales
+    Route::prefix('profil_sales')->name('profil_sales.')->group(function() {
+        Route::get('/', [SalesProfilSalesController::class, 'index'])->name('index');
+        Route::get('/create', [SalesProfilSalesController::class, 'create'])->name('create');
+        Route::post('/store', [SalesProfilSalesController::class, 'store'])->name('store');
+    });
 
-    // Jadwal sales
-    Route::get('/jadwal', [JadwalController::class, 'index_sales'])->name('sales.jadwal.index');
+    // Produk Sales
+    Route::prefix('produk')->name('produk.')->group(function() {
+        Route::get('/', [SalesProdukController::class, 'index'])->name('index');
+        Route::get('/create', [SalesProdukController::class, 'create'])->name('create');
+        Route::post('/store', [SalesProdukController::class, 'store'])->name('store');
+        Route::get('/edit/{id}', [SalesProdukController::class, 'edit'])->name('edit');
+        Route::put('/update/{id}', [SalesProdukController::class, 'update'])->name('update');
+        Route::get('/detail/{id}', [SalesProdukController::class, 'detail'])->name('detail');
+    });
 
-    // Kunjungan sales
-    Route::get('/kunjungan', [KunjunganController::class, 'index_sales'])->name('sales.kunjungan.index');
-    Route::get('/kunjungan/detail/{id}', [KunjunganController::class, 'detail_sales'])->name('sales.kunjungan.detail');
-    Route::post('/validate-location', [KunjunganController::class, 'validateLocation_sales'])->name('sales.kunjungan.validate.location');
-    Route::get('/kunjungan/create', [KunjunganController::class, 'create_sales'])->name('sales.kunjungan.create');
-    Route::post('/kunjungan/store', [KunjunganController::class, 'store_sales'])->name('sales.kunjungan.store');
+    // Jadwal Sales
+    Route::prefix('jadwal')->name('jadwal.')->group(function() {
+        Route::get('/', [SalesJadwalController::class, 'index'])->name('index');
+    });
 
-    // Tim sales
-    Route::get('/tim_sales', [TimSalesController::class, 'index_sales'])->name('sales.tim_sales.index');
+    // Kunjungan Sales
+    Route::prefix('kunjungan')->name('kunjungan.')->group(function() {
+        Route::get('/', [SalesKunjunganController::class, 'index'])->name('index');
+        Route::get('/detail/{id}', [SalesKunjunganController::class, 'detail'])->name('detail');
+        Route::post('/validate-location', [SalesKunjunganController::class, 'validateLocation_sales'])->name('validate.location');
+        Route::get('/create', [SalesKunjunganController::class, 'create'])->name('create');
+        Route::post('/store', [SalesKunjunganController::class, 'store'])->name('store');
+    });
+
+    // Tim Sales
+    Route::prefix('tim_sales')->name('tim_sales.')->group(function() {
+        Route::get('/', [SalesTimSalesController::class, 'index'])->name('index');
+    });
+
 });
+
