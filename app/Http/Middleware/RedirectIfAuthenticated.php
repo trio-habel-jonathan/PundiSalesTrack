@@ -14,13 +14,7 @@ class RedirectIfAuthenticated
             $role = Auth::user()->role;
 
             // Redirect berdasarkan role
-            if ($role === 'admin') {
-                return redirect()->route('admin.dashboard');
-            } elseif ($role === 'sales') {
-                return redirect()->route('sales.profil_sales.index'); // Pastikan route ini tidak melakukan redirect lain
-            }
-
-            return redirect('/'); // Jika role tidak diketahui, arahkan ke halaman utama
+            return redirect()->back()->with('error', 'Anda tidak memiliki akses ke halaman ini.');
         }
 
         return $next($request);
