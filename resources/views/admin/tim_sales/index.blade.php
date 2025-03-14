@@ -5,7 +5,7 @@
         <!-- Header with Search and Actions -->
         <div class="flex items-center justify-between mb-8">
             <div>
-                <h1 class="text-2xl font-semibold">Table Tim Sales</h1>
+                <h1 class="text-2xl font-semibold">Tim Sales</h1>
                 <p class="text-sm text-gray-500 mt-1">kelola semua data nama tim sales</p>
             </div>
             
